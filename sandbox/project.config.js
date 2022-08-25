@@ -1,7 +1,8 @@
 module.exports = {
     project: {
-        name: "src",
+        source: "src",
         env: {
+            protocol:"http",
             port:3333,
         }
     }

@@ -7,6 +7,16 @@ const paths = {
     lib: path.join(__dirname, "..", "libs"),
 }
 
+require("module").TYPE = {
+    configuration : Symbol("configuration"),
+    controller : Symbol("controller"),
+    custom : Symbol("custom"),
+    library : Symbol("library"),
+    middleware : Symbol("middleware"),
+    service : Symbol("service"),
+    model : Symbol("model"),
+}
+
 const configs = {}
 
 fs.readdirSync(
@@ -27,12 +37,5 @@ fs.readdirSync(
         configs[config.id] = config.content;
     })
 
-require("module").TYPE = {
-    configuration : Symbol("configuration"),
-    controller : Symbol("controller"),
-    custom : Symbol("custom"),
-    library : Symbol("library"),
-    middleware : Symbol("middleware"),
-    service : Symbol("service"),
-}
+
 
