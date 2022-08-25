@@ -1,3 +1,0 @@
-function get(req, res){
-    
-}

@@ -1,0 +1,12 @@
+const load = require("./load");
+
+// console.log(global);
+// console.log(test);
+
+const express = require('express');
+const app = express();
+
+
+// http.createServer(app).listen(require(Server.CONFIG).port, () => {
+//     console.log(`app listening at https://localhost:${serverConfig.port}`);
+// });

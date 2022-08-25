@@ -1,0 +1,38 @@
+const path = require("path");
+const fs = require("fs");
+
+const paths = {
+    server: path.join(__dirname, ".."),
+    config: path.join(__dirname, "..", "conf"),
+    lib: path.join(__dirname, "..", "libs"),
+}
+
+const configs = {}
+
+fs.readdirSync(
+        paths.config,
+        { withFileTypes:true }
+    )
+    .filter(dirent => !dirent.isDirectory())
+    .filter(dirent => dirent.name.includes(".config.js"))
+    .map(dirent => dirent.name)
+    .map(filename => {
+        const id = path.basename(filename, path.extname(filename));
+        return {
+            id: path.basename(id, path.extname(id)),
+            content: require(`${paths.config}/${id}`),
+        }
+    })
+    .forEach(config=>{
+        configs[config.id] = config.content;
+    })
+
+require("module").TYPE = {
+    configuration : Symbol("configuration"),
+    controller : Symbol("controller"),
+    custom : Symbol("custom"),
+    library : Symbol("library"),
+    middleware : Symbol("middleware"),
+    service : Symbol("service"),
+}
+
