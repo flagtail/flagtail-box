@@ -1,6 +1,6 @@
 const Component = require("./component.class")
 
-class Router extends Component{
+class Router extends Component {
     
     uri() {
         return "*"

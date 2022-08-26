@@ -1,7 +1,7 @@
-const load = require("./load");
-
 const express = require('express');
 const app = express();
+
+const load = require("./load");
 
 
 http.createServer(app).listen(3333, () => {

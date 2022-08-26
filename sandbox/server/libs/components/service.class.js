@@ -1,11 +1,5 @@
 const Component = require("./component.class")
 
-class Service extends Component {
-
-    execute(app) {
-        throw new SyntaxError("<Configuration.class> config() not overrided");
-    }
-    
-}
+class Service extends Component {}
 
 module.exports = Service;

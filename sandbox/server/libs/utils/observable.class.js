@@ -18,10 +18,9 @@ module.exports = class Observable {
         this.observers.forEach(observer => observer(data));
     }
 
-    
     notifySafe(data){
         return {
-            inspect(callback){
+            through(callback){ // the callback returns true of false
                 this.observers.forEach(observer => {
                     if(callback(data)){
                         observer(data)

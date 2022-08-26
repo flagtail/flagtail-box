@@ -1,68 +1,55 @@
-class ModuleBuilder {
+const path = require("path");
+const fs = require("fs");
+const Typing = require("./typing.class");
+const TypeParser = require("./type-parser.class");
 
-    static ROOT = Symbol("root")
-    static PROJECT = Symbol("project")
-    static MOD = "<<MODULE>>"
+module.exports = class ModuleScanner {
 
-    static build(options) {
-        /* 
-            options : { 
-                from : the path string,
-                excludeFiles : string[] the filename or dirname,
-            }
-        */
-        const moduleStructure = new Module({
-                                        [ModuleBuilder.ROOT]: options.from,
-                                        [ModuleBuilder.PROJECT]: ModuleBuilder.#scan(options),
-                                    })
-                            
-        return Object.freeze(moduleStructure);
-    }
+    static scan(option){
 
-    static #scan(options) {
-        options = ModuleBuilder.#validateOption(options);
+        option.from = option.from ?? ".";
+        option.extension = option.extension ?? "*";
 
         let modStruct = {};
         
-        const dirents = fs.readdirSync(options.from, { withFileTypes:true }).filter(dirent => !options.excludeFiles.includes(dirent.name))
+        const dirents = fs.readdirSync(option.from, { withFileTypes:true })
         
         for(const dirent of dirents) {
 
             const isDir = dirent.isDirectory();
 
             if(isDir) {
-                const newOptions = { ...options }
-                newOptions.from = Path.from(options.from).getPath(dirent.name);
-                modStruct[dirent.name] = ModuleBuilder.#scan(newOptions);
+                const newOption = { ...option }
+                const directoryPath = Path.from(option.from).getPath(dirent.name);
+                newOption.from = directoryPath;
+                modStruct[dirent.name] = ModuleScanner.scan(newOption);
             }
 
             if(!isDir) {
                 const moduleName = path.basename(dirent.name, path.extname(dirent.name));
-                // modStruct[moduleName] = dirent.name;
-                if(!(modStruct[ModuleBuilder.MOD])) {
-                    modStruct[ModuleBuilder.MOD] = []
-                }
-
-                modStruct[ModuleBuilder.MOD] = [...modStruct[ModuleBuilder.MOD], dirent.name]
+                modStruct[moduleName] = option.from;
             }
         }
 
-        return modStruct;
+        return modStruct;     
     }
 
-    static #validateOption(options){
-        options = options ?? {}
-        options.from    = options?.from ?? Path.from(__dirname).getPath(".");
-        options.excludeFiles = options?.excludeFiles ?? null;
-        // options.include = options?.include ?? null
-        // options.type    = options?.type ?? ModuleType.FILES;
+    static matchExtenstion(extname, extension){
+        if(extension === "*") {
+            return true;
+        }
 
-        if(!(options.from instanceof Path)) { new TypeError("options.from must be <Path> type") }
-        if(options.excludeFiles !== null && !(options.excludeFiles instanceof Array)) { new TypeError("options.excludeFiles must be <Array> type") }
-        // if(options.include !== null && !(options.include instanceof Array)) { new TypeError("options.include must be <Array> type") }
-        // if(!(typeof options.type === "symbol")) { new TypeError("option.type must be symbol of <ModuleType>")}
+        if(Typing.isArray(extension)) {
+            extension.forEach(ext => {
+                if(ext === extname) {
+                    return true;
+                }
+            });
+        }
 
-        return options;
+        // if(Typing.is(extension).instanceOf())
     }
-    
+ 
 }
+
+TypeParser.castFrom(10).toWrapperType();

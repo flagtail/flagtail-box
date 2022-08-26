@@ -1,151 +1,69 @@
-const JSONUtils = require("./json-util.class")
+const TypeParser = require("./type-parser.class")
 
 module.exports = class Typing {
 
-    static isNotNull(target) {
+    static isNotNull(value) {
         return (
-            target !== null &&
-            target !== undefined &&
-            target !== ""
+            value !== null &&
+            value !== undefined &&
+            value !== ""
         ) ? true : false;
     }
 
-    static isNull(target) {
+    static isNull(value) {
         return (
-            target === null ||
-            target === undefined ||
-            target === ""
+            value === null ||
+            value === undefined ||
+            value === ""
         ) ? true : false;
     }
 
-    static ifNullAction(target, action, ...args) {
-        if (Typing.isNull(target)) {
-            if (Typing.isFunction(action)) return action(...args);
-            return action;
+    static ifNullThrow(value) {
+        if (Typing.isNull(value)) {
+            throw new TypeError(`the value is null or undefined or empty`)
         }
     }
 
-    static ifNullThrow(target) {
-        if (Typing.isNull(target)) {
-            throw new TypeError(`the target is null or undefined or empty`)
-        }
-    }
-
-    static checkWrapper(valueOfTarget) {
+    static isWrapper(value) {
         const wrapperClasses = [String, Number, Boolean];
-        return wrapperClasses.find(clazz => valueOfTarget instanceof clazz)
+        return wrapperClasses.find(clazz => value instanceof clazz)
     }
 
-    static checkPrimitive(valueOfTarget) {
-        const primitiveClasses = [
-            typeof 'str',
-            typeof 10,
-            typeof true,
-            typeof BigInt(10),
-            typeof Symbol()
-        ];
-        return primitiveClasses.find(typeName => typeof valueOfTarget === typeName)
+    static isPrimitive(value) {
+        return (typeof value !== 'object' && typeof value !== 'function') || value === null
     }
 
-    static wrapperToPrimitive(wrapperTypeName) {
-        let primitiveTypeName;
-
-        if (wrapperTypeName === Boolean) {
-            primitiveTypeName = typeof true;
-        } else if (wrapperTypeName === Number) {
-            primitiveTypeName = typeof 10;
-        } else if (wrapperTypeName === BigInt) {
-            primitiveTypeName = typeof BigInt(10);
-        } else if (wrapperTypeName === String) {
-            primitiveTypeName = typeof 'str';
-        } else if (wrapperTypeName === Symbol) {
-            primitiveTypeName = typeof Symbol();
-        } else {
-            primitiveTypeName = null;
-        }
-
-        return primitiveTypeName;
+    static isFunction(value) {
+        return typeof value === "function" && value.toString().startsWith("function")
     }
 
-    static isFunction(target) {
-        return typeof target === "function" && target.toString().startsWith("function")
+    static isClass(value) {
+        return typeof value === "function" && value.toString().startsWith("class")
     }
 
-    static isClass(target) {
-        return typeof target === "function" && target.toString().startsWith("class")
+    static isObject(value) {
+        return typeof value === "object"
     }
 
-    static match(expectedType) {
+    static isArray(value) {
+        return typeof value === "object" || value instanceof Array;
+    }
+
+    static is(value) {
         return {
-            parse: function (target) {
-                const wrapperTypeNameOfTarget = Typing.checkWrapper(target);
-                if (wrapperTypeNameOfTarget) {
-                    return wrapperTypeNameOfTarget === expectedType;
-                }
+            instanceOf(typeName) {
+                return value instanceof typeName;
+            },
 
-                const primitiveTypeNameOfTarget = Typing.checkPrimitive(target);
-
-                if (primitiveTypeNameOfTarget) {
-                    return primitiveTypeNameOfTarget === Typing.wrapperToPrimitive(expectedType);
+            primitiveOf(typeName) {
+                if(TypeParser.isWrapperType(typeName)) {
+                    TypeParser.wrapperToPrimitive(typeName)
                 }
+            },
 
-                if (!wrapperTypeNameOfTarget && !primitiveTypeNameOfTarget) {
-                    return target instanceof expectedType
-                }
+            same(valueOrType) {
+                return value === valueOrType;
             }
-        }
-    }
-
-    static scheme(json, schema) {
-        const result = {}
-
-        if (json instanceof Array) {
-            const arrResult = []
-            for (let i = 0; i < json.length; i++) {
-                if (json[i] instanceof Object  && !Typing.checkWrapper(json[i])) {
-                    const objectScheme = schema.filter(type=>{
-                            return type instanceof Object && !Typing.isFunction(type);
-                        })
-                    arrResult[i] = Typing.scheme(json[i], objectScheme[0]);
-                } else {
-                    const notObjectScheme = schema.filter(type=>{
-                            return Typing.isFunction(type);
-                        })
-                    let typeMatchResult = false;
-                    for(const type of notObjectScheme){
-                        if(Typing.match(type).parse(json[i])){
-                            typeMatchResult = true;
-                            break;
-                        }
-                    }
-                    arrResult[i] = typeMatchResult;
-                }
-            }
-            return arrResult;
-        } else {
-            for (const key in json) {
-                if (json[key] instanceof Object && !Typing.checkWrapper(json[key])) {
-                    result[key] = Typing.scheme(json[key], schema[key])
-                } else {
-                    result[key] = Typing.match(schema[key]).parse(json[key])
-                }
-            }
-            return result;
-        }
-    }
-
-    static isSchemeValid(resultOfScheme){
-        let isValidScheme = true;
-        try{
-            JSONUtils.parse(resultOfScheme, value=>{
-                if(value === false){
-                    throw new SyntaxError()
-                }
-            })
-        }catch{
-            isValidScheme = false;
-        }finally{
-            return isValidScheme;
         }
     }
 

@@ -17,7 +17,7 @@ require("module").TYPE = {
     model : Symbol("model"),
 }
 
-const configs = {}
+const internalConfigs = {}
 
 fs.readdirSync(
         paths.config,
@@ -34,8 +34,14 @@ fs.readdirSync(
         }
     })
     .forEach(config=>{
-        configs[config.id] = config.content;
+        internalConfigs[config.id] = config.content;
     })
 
+console.log(internalConfigs.rootPath);
 
-
+const ModuleScanner = require(`${paths.lib}/utils/module-scanner`)
+const scanned = ModuleScanner.scan({
+        from: internalConfigs.rootPath,
+        extenstion: ".js"
+    })
+console.log(JSON.stringify(scanned, null, 4))

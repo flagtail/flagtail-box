@@ -4,7 +4,7 @@ module.exports = class Path {
 
     static from(rootPath){
         return {
-            getPath(subPath){
+            getPath(subPath) {
                 if(subPath instanceof Array) {
                     return path.join(rootPath, ...subPath);   
                 }

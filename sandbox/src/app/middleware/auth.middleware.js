@@ -6,7 +6,7 @@ module.exports = class extends Middleware {
         return "/ping"
     }
 
-    handle(req) {
+    handle(req, res, next) {
         
     }
 
