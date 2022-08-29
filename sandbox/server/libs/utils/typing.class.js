@@ -1,6 +1,8 @@
-const TypeParser = require("./type-parser.class")
-
 module.exports = class Typing {
+
+    static #wrapperTypes = [ Boolean, Number, BigInt, String, Symbol]
+
+    static #primitiveTypes = [ "boolean", "number", "bigint", "string", "symbol" ]
 
     static isNotNull(value) {
         return (
@@ -46,7 +48,7 @@ module.exports = class Typing {
     }
 
     static isArray(value) {
-        return typeof value === "object" || value instanceof Array;
+        return typeof value === "object" && value instanceof Array;
     }
 
     static is(value) {
@@ -56,14 +58,23 @@ module.exports = class Typing {
             },
 
             primitiveOf(typeName) {
-                if(TypeParser.isWrapperType(typeName)) {
-                    TypeParser.wrapperToPrimitive(typeName)
+                
+                if(typeof typeName === "function") {
+                    return Typing.#wrapperTypes.includes(typeName);
                 }
+
+                if(typeof typeName === "string") {
+                    return Typing.#primitiveTypes.includes(typeName);
+                }
+
+                return false;
+
             },
 
-            same(valueOrType) {
+            sameWith(valueOrType) {
                 return value === valueOrType;
-            }
+            },
+            
         }
     }
 

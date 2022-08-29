@@ -1,20 +1,12 @@
 const path = require("path");
 const fs = require("fs");
+const utils = require("../libs/utils");
+const components = require("../libs/components");
 
 const paths = {
     server: path.join(__dirname, ".."),
     config: path.join(__dirname, "..", "conf"),
     lib: path.join(__dirname, "..", "libs"),
-}
-
-require("module").TYPE = {
-    configuration : Symbol("configuration"),
-    controller : Symbol("controller"),
-    custom : Symbol("custom"),
-    library : Symbol("library"),
-    middleware : Symbol("middleware"),
-    service : Symbol("service"),
-    model : Symbol("model"),
 }
 
 const internalConfigs = {}
@@ -37,11 +29,44 @@ fs.readdirSync(
         internalConfigs[config.id] = config.content;
     })
 
-console.log(internalConfigs.rootPath);
+require("module").TYPE = {
+    ...components,
+}
 
-const ModuleScanner = require(`${paths.lib}/utils/module-scanner`)
-const scanned = ModuleScanner.scan({
-        from: internalConfigs.rootPath,
-        extenstion: ".js"
+
+require("module").TYPE = {
+        configuration : Symbol("configuration"),
+        controller : Symbol("controller"),
+        custom : Symbol("custom"),
+        library : Symbol("library"),
+        middleware : Symbol("middleware"),
+        service : Symbol("service"),
+        model : Symbol("model"),
+    }
+    
+
+const scannedJson = utils.ModuleScanner.scan({
+        from: internalConfigs.server.rootPath,
+        extension: [".js"]
     })
-console.log(JSON.stringify(scanned, null, 4))
+
+const projectConfigName = path.basename(internalConfigs.server.configFile, path.extname(internalConfigs.server.configFile));
+const projectConfigFile = scannedJson[projectConfigName];
+
+if(!projectConfigFile) throw new ReferenceError(`not exists CONFIG FILE on root of project path : ${projectConfigName}`);
+
+const projectConfig = require(`${projectConfigFile}`);
+
+const sourceFiles = scannedJson[projectConfig.project.source]
+
+const sourceModules = []
+
+utils.JSONHandler.action(sourceFiles, {
+    returnValue: (value) => {
+        sourceModules.push(value);
+        return value;
+    }
+})
+
+console.log(sourceModules);
+

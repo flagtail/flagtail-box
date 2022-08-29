@@ -1,7 +1,7 @@
 const path = require("path");
 const fs = require("fs");
+const Path = require("./path.class");
 const Typing = require("./typing.class");
-const TypeParser = require("./type-parser.class");
 
 module.exports = class ModuleScanner {
 
@@ -27,7 +27,11 @@ module.exports = class ModuleScanner {
 
             if(!isDir) {
                 const moduleName = path.basename(dirent.name, path.extname(dirent.name));
-                modStruct[moduleName] = option.from;
+
+                if(this.matchExtenstion(path.extname(dirent.name), option.extension)) {
+                    modStruct[moduleName] = `${option.from}/${moduleName}`;
+                }
+                
             }
         }
 
@@ -35,21 +39,24 @@ module.exports = class ModuleScanner {
     }
 
     static matchExtenstion(extname, extension){
+
         if(extension === "*") {
             return true;
         }
 
         if(Typing.isArray(extension)) {
-            extension.forEach(ext => {
-                if(ext === extname) {
+            for(let i = 0; i < extension.length; i++) {
+                if(extension[i] === extname){
                     return true;
                 }
-            });
+            }
         }
 
-        // if(Typing.is(extension).instanceOf())
-    }
- 
-}
+        if(Typing.is(extension).primitiveOf(String)){
+            return extname === extension;
+        }
 
-TypeParser.castFrom(10).toWrapperType();
+        return false;
+    }
+    
+}
