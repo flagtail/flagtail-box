@@ -1,14 +1,14 @@
 module.exports = class JSONHandler {
 
-    static action(json, option) {
+    static action(json, option, flattenJson) {
 
-        option.replaceKey = option?.replaceKey ?? function(key) { return key }
-        option.returnValue = option?.returnValue ?? function (value) { return value }
-    
+        option = option ?? {};
+        option.replaceKey = option?.replaceKey ?? function(key) { return key };
+        option.returnValue = option?.returnValue ?? function (value) { return value };
+        
         const result = {}
     
         if (json instanceof Array) {
-
             const arrResult = []
             for (let i = 0; i < json.length; i++) {
                 if (json[i] instanceof Object) {
@@ -38,10 +38,5 @@ module.exports = class JSONHandler {
     
     }
 
-    static flatten(json) {
-        const result = {}
-
-
-    }
 
 }

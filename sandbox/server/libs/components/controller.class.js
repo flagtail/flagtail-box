@@ -2,9 +2,14 @@ const Router = require("./router.class")
 
 class Controller extends Router{
 
-    handle(req, res) {
-        throw new SyntaxError("<Controller.class> handle() not overrided");
-    }
+    // DELETE 
+    // GET 
+    // HEAD 
+    // OPTIONS 
+    // PATCH 
+    // POST 
+    // PUT 
+    // TRACE 
 
 }
 
