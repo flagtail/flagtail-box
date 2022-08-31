@@ -1,5 +1,3 @@
-class Component { 
-    
-}
+class Component {}
 
 module.exports = Component;

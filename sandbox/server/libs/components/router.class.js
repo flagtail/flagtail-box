@@ -2,12 +2,12 @@ const Component = require("./component.class")
 
 class Router extends Component {
     
-    uri() {
-        return "*"
+    init() {
+        this.str = "hello world";
     }
 
-    handle() {
-        throw new SyntaxError("<Router.class> handle() not overrided");
+    uri() {
+        return "*"
     }
 
 }
