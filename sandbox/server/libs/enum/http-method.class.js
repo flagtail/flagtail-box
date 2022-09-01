@@ -1,10 +1,12 @@
 class HttpMethod {
-    static GET     = Symbol("get")
-    static POST    = Symbol("post")
-    static PUT     = Symbol("put")
-    static DELETE  = Symbol("delete")
-    static HEAD    = Symbol("head")
-    static OPTIONS = Symbol("options")
-    static PATCH   = Symbol("patch")
-    static TRACE   = Symbol("trace")
+    static GET     = "get";
+    static POST    = "post";
+    static PUT     = "put";
+    static DELETE  = "delete";
+    static HEAD    = "head";
+    static OPTIONS = "options";
+    static PATCH   = "patch";
+    static TRACE   = "trace";
 }
+
+module.exports = Object.freeze(HttpMethod);

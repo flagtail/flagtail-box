@@ -1,15 +1,14 @@
 const Component = require("./component.class")
+const HttpMethod = require("../enum/http-method.class")
 
 class Router extends Component {
-    
-    init() {
-        this.str = "hello world";
-    }
 
+    HttpMethod = HttpMethod
+    
     uri() {
         return "*"
     }
 
 }
 
-module.exports = Router
+module.exports = Router;
