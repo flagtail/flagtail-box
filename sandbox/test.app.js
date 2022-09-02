@@ -3,16 +3,22 @@ const express = require('express');
 const app = express();
 
 app.use(express.json())
-app.use(express.urlencoded({extended:true}))
+app.use(express.urlencoded({ extended: true }))
 
 class Member {
+
+    init() {
+        this.name = "jade";
+    }
+
     get(req, res) {
         console.log("get request");
         console.log(req.params);
+        console.log(`the name is ${this.name}`)
         res.send("hello world");
     }
 
-    static get(req,res) {
+    static get(req, res) {
         console.log("static get request");
         console.log(req.params);
         res.send("static world")
@@ -20,13 +26,14 @@ class Member {
 }
 
 
-const m = new Member()
+const m = new Member();
 const router = express.Router();
 
 const insGet = m.get;
 const staGet = Member.get;
 
 router.get("/ins", insGet);
+router.get("/inss", m.get);
 router.get("/sta", staGet);
 
 app.use("/", router);
