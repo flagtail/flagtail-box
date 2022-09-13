@@ -1,14 +1,15 @@
 const path = require("path");
 const fs = require("fs");
 const utils = require("../libs/utils");
-const components = require("../libs/components");
 
+/* Ready to Load */
 const paths = {
     server: path.join(__dirname, ".."),
     config: path.join(__dirname, "..", "conf"),
     lib: path.join(__dirname, "..", "libs"),
 }
 
+/* Load Configuration Files : `conf` */
 const internalConfigs = {}
 
 fs.readdirSync(
@@ -28,23 +29,8 @@ fs.readdirSync(
     .forEach(config=>{
         internalConfigs[config.id] = config.content;
     })
-
-require("module").TYPE = {
-    ...components,
-}
-
-
-require("module").TYPE = {
-        configuration : Symbol("configuration"),
-        controller : Symbol("controller"),
-        custom : Symbol("custom"),
-        library : Symbol("library"),
-        middleware : Symbol("middleware"),
-        service : Symbol("service"),
-        model : Symbol("model"),
-    }
     
-
+/* Load Source Files */
 const scannedJson = utils.ModuleScanner.scan({
         from: internalConfigs.server.rootPath,
         extension: [".js"]
@@ -55,7 +41,7 @@ const projectConfigFile = scannedJson[projectConfigName];
 
 if(!projectConfigFile) throw new ReferenceError(`not exists CONFIG FILE on root of project path : ${projectConfigName}`);
 
-const projectConfig = require(`${projectConfigFile}`);
+const projectConfig = require(`${projectConfigFile}`); // default project.config.js
 
 const sourceFiles = scannedJson[projectConfig.project.source]
 
@@ -68,5 +54,15 @@ utils.JSONHandler.action(sourceFiles, {
     }
 })
 
-console.log(sourceModules);
 
+/* Mapping Loaded Source Files */
+const boundedSourceModules = sourceModules.map(modulePath => {
+    const modulePathArr = modulePath.split(path.sep)
+    const rootPathPoint = modulePathArr.indexOf(projectConfig.project.source)
+    return {
+        [modulePathArr.slice(rootPathPoint + 1).join("/")] : modulePath
+    }
+})
+
+
+console.log(boundedSourceModules)
