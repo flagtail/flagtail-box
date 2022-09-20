@@ -1,7 +1,5 @@
-module.exports = {
-
-}
-
-const Modularize = require("./module/modularize.class")
-
-console.log(Modularize.from(__dirname))
+const ModuleScanner = require("./module/module-scanner.class")
+module.exports = ModuleScanner.bundle(__dirname, {
+    ignoreDir:["deep-dump", "test-dump"],
+    ignoreFile:["good"],
+});

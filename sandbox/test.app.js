@@ -14,6 +14,7 @@ class Member {
     get(req, res) {
         console.log("get request");
         console.log(req.params);
+        console.log(this);
         console.log(`the name is ${this.name}`)
         res.send("hello world");
     }
@@ -28,10 +29,17 @@ class Member {
 
 const m = new Member();
 const router = express.Router();
-
-const insGet = m.get;
+m.init();
+const insGet = m.get.bind(m);
 const staGet = Member.get;
 
+app.use("/", (req,res,next)=> {
+    console.log(req.path)
+    next();
+})
+router.get("/test", (req,res)=>{
+    res.send("hello world");
+})
 router.get("/ins", insGet);
 router.get("/inss", m.get);
 router.get("/sta", staGet);

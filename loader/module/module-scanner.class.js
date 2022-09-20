@@ -2,6 +2,7 @@ const path = require("path");
 const fs = require("fs");
 const Path = require("./path.class");
 const Typing = require("./typing.class");
+const JSONResolver = require("./json-resolver.class")
 
 module.exports = class ModuleScanner {
 
@@ -59,4 +60,46 @@ module.exports = class ModuleScanner {
         return false;
     }
     
+    static bundle(path, option){
+
+        option = option ?? {};
+        const ignoreDir = option.ignoreDir ?? [];
+        const ignoreFile = option.ignoreFile ?? [];
+
+        const sep = require("path").sep;
+        const root = path.split(sep)[path.split(sep).length-1]
+        const bundle = {}
+
+        const scanned = ModuleScanner.scan({
+            from:path,
+            extension:[".js"],
+        })
+
+        JSONResolver.action(scanned, {
+            returnValue: (modulePath) => {
+                const modulePathArr = modulePath.split(sep);
+                const rootPathPoint = modulePathArr.indexOf(root);
+                const moduleNameArr = modulePathArr.slice(rootPathPoint + 1);
+                const moduleName = moduleNameArr.join("/");
+
+                if(ignoreDir.length > 0 && moduleNameArr.length > 1) {
+                    for(let i = 0; i < moduleNameArr.length - 1; i++) {                    
+                        const result = ignoreDir.find(dirName=> dirName === moduleNameArr[i]);
+                        if(Typing.isNotNull(result)) return;
+                    }
+                }
+
+                if(ignoreFile.length > 0 ) {
+                    const result = ignoreFile.find(fileName=>fileName === moduleNameArr[moduleNameArr.length-1]);
+                    if(result) return;
+                }
+
+                bundle[moduleName] = modulePath;
+            }
+        })
+
+        if(bundle.index) delete bundle.index
+
+        return bundle;
+    }
 }

@@ -1,4 +1,48 @@
-module.exports = class Typing {
+const JSONResolver = require("./json-resolver.class");
+
+const preventSignal = Symbol("prevent-direct-call")
+
+class TypingChain {
+
+    #target;
+    #boolResults
+    #verbose
+
+    constructor(target, internalSignal) {
+        this.#preventDirectCall("TypingChain", internalSignal);
+        this.#target = target;
+        this.#boolResults = [];
+        this.#verbose = [{target}];
+    }
+
+    get target(){
+        return this.#target;
+    }
+
+    isValid() {
+        return this.#boolResults.every(trueOrFalse => trueOrFalse === true);
+    }
+
+    verbose() {
+        return JSONResolver.action(this.#verbose);
+    }
+
+    #preventDirectCall(name, internalSignal){
+        if(internalSignal !== preventSignal) throw SyntaxError(`Can't direct call ${name}`);
+    }
+
+    update(args, internalSignal){
+        this.#preventDirectCall("TypingChain.update", internalSignal);
+        this.#boolResults.push(args.result);
+        this.#verbose.push({ [args.name]: args.result });
+    }
+}
+
+class Typing {
+
+    constructor() {
+        throw new SyntaxError("Can't make <Typing> instance");
+    }
 
     static #wrapperTypes = [ Boolean, Number, BigInt, String, Symbol]
 
@@ -28,7 +72,7 @@ module.exports = class Typing {
 
     static isWrapper(value) {
         const wrapperClasses = [String, Number, Boolean];
-        return wrapperClasses.find(clazz => value instanceof clazz)
+        return wrapperClasses.some(clazz => value instanceof clazz)
     }
 
     static isPrimitive(value) {
@@ -53,6 +97,7 @@ module.exports = class Typing {
 
     static is(value) {
         return {
+            
             instanceOf(typeName) {
                 return value instanceof typeName;
             },
@@ -78,4 +123,41 @@ module.exports = class Typing {
         }
     }
 
+    static chain(target) {
+
+        const propNames = Object.getOwnPropertyDescriptors(Typing);
+
+        const chainable = new TypingChain(target, preventSignal);
+        
+        ["instanceOf", "primitiveOf", "sameWith"].forEach(innerKeyOf_is=>{
+            chainable[innerKeyOf_is] = function(arg) {
+                this.update({
+                    name: innerKeyOf_is, 
+                    result: Typing.is(this.target)[innerKeyOf_is](arg),
+                    param: arg,
+                }, preventSignal);
+                return this;
+            } 
+        })
+
+        delete propNames["chain"]
+        delete propNames["is"]
+
+
+        for(const key in propNames){
+            if(key === "length" || key === "name" || key === "prototype") continue;
+            chainable[key] = function() {
+                this.update({
+                    name: key, 
+                    result: Typing[key](this.target),
+                }, preventSignal);
+                return this;
+            }
+        }
+
+        return chainable;
+    }
+
 }
+
+module.exports = Typing

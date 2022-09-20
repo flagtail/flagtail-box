@@ -1,4 +1,4 @@
-module.exports = class JSONHandler {
+module.exports = class JSONResolver {
 
     static action(json, option) {
 
@@ -12,7 +12,7 @@ module.exports = class JSONHandler {
             const arrResult = []
             for (let i = 0; i < json.length; i++) {
                 if (json[i] instanceof Object) {
-                    arrResult[i] = JSONHandler.action(json[i], option)
+                    arrResult[i] = JSONResolver.action(json[i], option)
                 } else {
                     arrResult[i] = option.returnValue(json[i]);
                 }
@@ -23,7 +23,7 @@ module.exports = class JSONHandler {
 
             for (const key in json) {
                 if (json[key] instanceof Object) {
-                    result[key] = JSONHandler.action(json[key], option)    
+                    result[key] = JSONResolver.action(json[key], option)    
                 } else {
                     const keyDesc = Object.getOwnPropertyDescriptor(json, key);
                     const newKey = option.replaceKey(key);
@@ -37,6 +37,5 @@ module.exports = class JSONHandler {
         }
     
     }
-
 
 }
