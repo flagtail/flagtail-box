@@ -1,6 +1,6 @@
 const path = require("path");
 
-module.exports = class Path {
+module.exports = class PathBuilder {
 
     static from(rootPath){
         return {

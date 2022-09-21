@@ -1,8 +1,8 @@
 const path = require("path");
 const fs = require("fs");
-const Path = require("./path.class");
-const Typing = require("./typing.class");
-const JSONResolver = require("./json-resolver.class")
+const Path = require("./PathBuilder.class");
+const Typing = require("./Typing.class");
+const JSONResolver = require("./JSONResolver.class")
 
 module.exports = class ModuleScanner {
 

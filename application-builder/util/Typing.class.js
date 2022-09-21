@@ -1,4 +1,4 @@
-const JSONResolver = require("./json-resolver.class");
+const JSONResolver = require("./JSONResolver.class");
 
 const preventSignal = Symbol("prevent-direct-call")
 
@@ -68,6 +68,7 @@ class Typing {
         if (Typing.isNull(value)) {
             throw new TypeError(`the value is null or undefined or empty`)
         }
+        return true;
     }
 
     static isWrapper(value) {
@@ -117,6 +118,12 @@ class Typing {
             },
 
             sameWith(valueOrType) {
+                if(Typing.isArray(valueOrType)) {
+                    for(let i = 0; valueOrType.length > 0; i++){
+                        if(value === valueOrType[i]) return true;
+                    }
+                    return false;
+                }
                 return value === valueOrType;
             },
             
