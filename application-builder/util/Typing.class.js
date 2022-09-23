@@ -96,6 +96,8 @@ class Typing {
         return typeof value === "object" && value instanceof Array;
     }
 
+    //TODO : jsonKeys [ sample, sample.a, sample.a.b ]
+
     static is(value) {
         return {
             

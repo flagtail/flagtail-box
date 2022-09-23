@@ -9,7 +9,6 @@ module.exports = class Context {
                 Typing.chain(args).isNotNull(),
                 Typing.chain(args.urlScheme).isNotNull().primitiveOf(String).sameWith(["http","https"]),
                 Typing.chain(args.port).isNotNull().primitiveOf(Number),
-                
             ].every(result => result.isValid())
         ) throw new SyntaxError("invalid arguments");
         
